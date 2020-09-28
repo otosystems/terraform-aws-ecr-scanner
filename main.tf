@@ -88,6 +88,7 @@ module "ecr-scan-notify-lambda" {
     SLACK_EMOJI       = var.slack_emoji
     SLACK_WEBHOOK_URL = var.slack_webhook_url
     RISK_LEVELS       = var.risk_levels
+    TAG_TO_NOTIFY     = var.tag_to_notify
 
   }
 

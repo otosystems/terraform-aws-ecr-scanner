@@ -18,6 +18,7 @@ def get_all_image_data(repository):
     """
     images = []
     levels = os.environ['RISK_LEVELS']
+    tag_to_check = os.environ.get('TAG_TO_NOTIFY')
 
     try:
         response = client.describe_images(repositoryName=repository, filter={
@@ -30,9 +31,15 @@ def get_all_image_data(repository):
     for image in response:
         image_data = {}
         try:
+            if tag_to_check is not None and tag_to_check not in image['imageTags']:
+                logger.debug('Only notifying for images with a tag %s', tag_to_check)
+                logger.debug(image['imageTags'])
+                continue
             image_data['imageTags'] = image['imageTags']
         except KeyError:
-            image_data['imageTags'] = 'IMAGE UNTAGGED'
+            if tag_to_check is not None:
+                continue
+            image_data['imageTags'] = ['IMAGE UNTAGGED']
         try:
             image_data['imageScanStatus'] = image['imageScanFindingsSummary']['findingSeverityCounts']
         except KeyError:
@@ -119,16 +126,17 @@ def create_image_scan_slack_block(repository, repository_scan_block_list):
 # Send a message to a slack channel
 def notify_slack(slack_block):
     slack_url = os.environ['SLACK_WEBHOOK_URL']
-    slack_channel = os.environ['SLACK_CHANNEL']
+    slack_channel = os.environ.get('SLACK_CHANNEL')
     slack_username = os.environ['SLACK_USERNAME']
     slack_emoji = os.environ['SLACK_EMOJI']
 
     payload = {
-        "channel": slack_channel,
         "username": slack_username,
         "icon_emoji": slack_emoji,
         "blocks": slack_block
     }
+    if slack_channel is not None:
+        payload["channel"] = slack_channel
 
     data = urllib.parse.urlencode({"payload": json.dumps(payload)}).encode("utf-8")
     req = urllib.request.Request(slack_url)

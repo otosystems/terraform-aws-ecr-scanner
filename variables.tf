@@ -56,6 +56,11 @@ variable "risk_levels" {
   default    = "HIGH, CRITICAL"
 }
 
+variable "tag_to_notify" {
+  description = "An optional image tag, for slack reports should be generated: e.g. latest"
+  type        = string
+}
+
 variable "subnet_ids" {
   description = "VPC subnets for Lambda"
   type        = list(string)
