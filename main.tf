@@ -115,12 +115,12 @@ resource "aws_iam_role" "iam_for_sfn" {
 }
 
 resource "aws_iam_policy" "policy_for_sfn_lambdas" {
-  name   = "policy_for_sfn_lambdas"
+  name   = "policy_for_sfn_lambdas-${random_string.postfix_generator.result}"
   policy = data.aws_iam_policy_document.sfn_invoke_lamnda.json
 }
 
 resource "aws_iam_policy" "cloudwatch_start_sfn" {
-  name   = "cloudwatch_start_sfn"
+  name   = "cloudwatch_start_sfn-${random_string.postfix_generator.result}"
   policy = data.aws_iam_policy_document.cloudwatch_start_sfn.json
 }
 
